@@ -18,38 +18,51 @@ class FormDialog extends React.Component {
     inventory: "",
     desc: "",
     submit: "",
-    img: "",
+    image: "",
+    // isUploading: false,
+    // progress: 0,
+    imageURL: "",
     resName: "",
     resDesc: "",
     resPrice: "",
     resInventory: "",
     resItems: ""
   };
-  addPhoto = event => {
-    this.setState({ img: event.target.value });
-  };
+
   handleClickOpen = _ => {
     this.setState({ open: true });
   };
   handleClose = _ => {
     this.setState({ open: false });
   };
+
+  // FUNCTION TO HANDLE NAME INPUT
   handleName = event => {
     this.setState({ name: event.target.value });
   };
+
+  // FUNCTION TO HANDLE PRICE INPUT
   handlePrice = event => {
     this.setState({ price: event.target.value });
   };
+
+  // FUNCTION TO HANDLE INVENTORY INPUT
   handleInventory = event => {
     this.setState({ inventory: event.target.value });
   };
+
+  // FUNCTION TO HANDLE DESCRIPTION INPUT
   handleDescription = event => {
     this.setState({ desc: event.target.value });
   };
+
+  // FUNCTION TO HANDLE PHOTO UPLOAD
   addPhoto = files => {
     // console.log("hello", uploadPhoto(files));
     console.log("hello", files[0]);
   };
+
+  // FUNCTION TO HANDLE SUBMIT / AXIOS POST DATA TO MONGODB
   handleSubmit = event => {
     event.preventDefault();
     const { name, desc, price, inventory } = this.state;
@@ -70,18 +83,18 @@ class FormDialog extends React.Component {
     });
   };
 
-  handleItems = _ => {
-    console.log("Running search");
-    axios.get("/item").then(({ data }) => {
-      this.setState({
-        name: data.resName,
-        desc: data.resDesc,
-        price: data.resPrice,
-        inventory: data.resInventory
-        // resItems: data
-      });
-    });
-  };
+  // handleItems = _ => {
+  //   console.log("Running search");
+  //   axios.get("/item").then(({ data }) => {
+  //     this.setState({
+  //       name: data.resName,
+  //       desc: data.resDesc,
+  //       price: data.resPrice,
+  //       inventory: data.resInventory
+  //       // resItems: data
+  //     });
+  //   });
+  // };
   render() {
     return (
       <div>
@@ -99,7 +112,8 @@ class FormDialog extends React.Component {
           onClose={this.handleClose}
           aria-labelledby="form-dialog-title"
         >
-          {/* <PhotoUpload handleSave={this.addPhoto} /> */}
+          <PhotoUpload handleSave={this.addPhoto} />
+          {/* <input type="file" onChange={this.addPhoto} /> */}
           <DialogContent>
             Open Camera
             <TextField
@@ -150,7 +164,6 @@ class FormDialog extends React.Component {
               </Grid>
             </Grid>
           </DialogContent>
-
           <DialogActions>
             <Grid container spacing={2}>
               <Grid item xs={6}>
