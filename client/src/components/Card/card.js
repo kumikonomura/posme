@@ -32,7 +32,7 @@ export default function ItemCardList(props) {
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
-            {/* { insert succulent here} */}
+            {/* { insert succulent name here} */}
             {item.name}
           </Typography>
         </CardContent>
@@ -40,7 +40,7 @@ export default function ItemCardList(props) {
       <CardActions>
         <Typography />
         <Typography>
-          {/* { insert succulent quantity here } */}
+          {/* { insert succulent price and quantity here } */}
           {item.price}
           {item.inventory}
         </Typography>
