@@ -8,7 +8,7 @@ import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
 import axios from "axios";
 import PhotoUpload from "../PhotoUpload";
-import { uploadPhoto } from "../../s3";
+// import { uploadPhoto } from "../../s3";
 
 class FormDialog extends React.Component {
   state = {
@@ -19,9 +19,8 @@ class FormDialog extends React.Component {
     desc: "",
     submit: "",
     image: "",
-    // isUploading: false,
-    // progress: 0,
     imageURL: "",
+    success: false,
     resName: "",
     resDesc: "",
     resPrice: "",
@@ -65,22 +64,72 @@ class FormDialog extends React.Component {
   // FUNCTION TO HANDLE SUBMIT / AXIOS POST DATA TO MONGODB
   handleSubmit = event => {
     event.preventDefault();
-    const { name, desc, price, inventory } = this.state;
+    const { name, desc, price, inventory, url: img } = this.state;
     console.log(
       `name is ${this.state.name} and price is ${
         this.state.price
       } and desc is ${this.state.desc} and inventory is ${this.state.inventory}`
     );
+    console.log(this.state);
     axios
-      .post("/item", { name, desc, price, inventory })
+      .post("/item", { name, desc, price, inventory, img })
       .then(res => console.log(res))
       .catch(err => console.log(err));
     this.setState({
       name: "",
       desc: "",
       price: "",
-      inventory: ""
+      inventory: "",
+      img: ""
     });
+  };
+
+  // AWS SDK
+  handleChange = ev => {
+    this.setState({ success: false, url: "" });
+  };
+  // Perform the upload
+  handleUpload = ev => {
+    let file = this.uploadInput.files[0];
+    // Split the filename to get the name and type
+    let fileParts = this.uploadInput.files[0].name.split(".");
+    let fileName = fileParts[0];
+    let fileType = fileParts[1];
+    console.log("Preparing the upload");
+    axios
+      .post("http://localhost:3000/item-upload", {
+        fileName: fileName,
+        fileType: fileType
+      })
+      .then(response => {
+        console.log(response);
+        var returnData = response.data.returnData;
+        console.log(returnData);
+        var signedRequest = returnData.signedRequest;
+        var url = returnData.url;
+        this.setState({ url: url });
+        console.log("Recieved a signed request " + signedRequest);
+
+        // Put the fileType in the headers for the upload
+        var options = {
+          headers: {
+            "Content-Type": fileType
+          }
+        };
+        axios
+          .put(signedRequest, file, options)
+          .then(result => {
+            console.log("Response from s3");
+            console.log(result);
+            this.setState({ success: true });
+          })
+          .catch(error => {
+            alert("ERROR " + JSON.stringify(error));
+          });
+      })
+      .catch(error => {
+        alert(JSON.stringify(error));
+      });
   };
 
   // handleItems = _ => {
@@ -96,6 +145,7 @@ class FormDialog extends React.Component {
   //   });
   // };
   render() {
+    console.log("hello my pretty", this.state);
     return (
       <div>
         <Button
@@ -112,8 +162,16 @@ class FormDialog extends React.Component {
           onClose={this.handleClose}
           aria-labelledby="form-dialog-title"
         >
-          <PhotoUpload handleSave={this.addPhoto} />
-          {/* <input type="file" onChange={this.addPhoto} /> */}
+          {/* <PhotoUpload handleSave={this.addPhoto} /> */}
+          <input
+            type="file"
+            onChange={this.handleChange}
+            ref={ref => {
+              this.uploadInput = ref;
+            }}
+          />
+          <br />
+          <button onClick={this.handleUpload}>UPLOAD</button>
           <DialogContent>
             Open Camera
             <TextField
@@ -170,6 +228,7 @@ class FormDialog extends React.Component {
                 <Button
                   // onClick={handleClose}
                   onClick={this.handleSubmit}
+                  // onClick={uploadPhoto}
                   fullWidth="true"
                   variant="contained"
                   color="primary"

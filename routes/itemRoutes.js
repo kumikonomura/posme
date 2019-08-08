@@ -1,4 +1,5 @@
 const { Item, Tab } = require("../models");
+var sign_s3 = require("../s3");
 
 module.exports = app => {
   // app.get("/item", (req, res) => {
@@ -21,19 +22,29 @@ module.exports = app => {
       .catch(e => console.log(e));
   });
 
-  app.post("/item", (req, res) => {
-    let name = req.body.name;
-    let desc = req.body.desc;
-    let price = req.body.price;
-    let inventory = req.body.inventory;
-    console.log(name);
-    console.log(desc);
-    console.log(price);
-    console.log(inventory);
-    Item.create({ name, desc, price, inventory })
-      .then(response => console.log(response))
-      .catch(err => console.log(err));
-  });
+  // app.post("/item", (req, res) => {
+  //   let name = req.body.name;
+  //   let desc = req.body.desc;
+  //   let price = req.body.price;
+  //   let inventory = req.body.inventory;
+  //   console.log(name);
+  //   console.log(desc);
+  //   console.log(price);
+  //   console.log(inventory);
+  //   Item.create({ name, desc, price, inventory })
+  //     .then(response => console.log(response))
+  //     .catch(err => console.log(err));
+  // });
+
+  // app.post("/item", (req, res) => {
+  //   let img = req.body.img;
+  //   console.log("this is your handler, aka, controller");
+  //   Item.create({ img })
+  //     .then(response => console.log(response))
+  //     .catch(err => console.log(err));
+  // });
+
+  app.post("/item-upload", sign_s3.sign_s3);
 
   app.post("/item", (req, res) => {
     Item.create(req.body)
