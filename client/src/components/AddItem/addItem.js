@@ -20,12 +20,7 @@ class FormDialog extends React.Component {
     submit: "",
     image: "",
     imageURL: "",
-    success: false,
-    resName: "",
-    resDesc: "",
-    resPrice: "",
-    resInventory: "",
-    resItems: ""
+    success: false
   };
 
   handleClickOpen = _ => {
